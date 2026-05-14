@@ -1,3 +1,13 @@
+---
+title: PrivatEdge
+emoji: 🛡️
+colorFrom: blue
+colorTo: indigo
+sdk: streamlit
+app_file: dashboard.py
+pinned: false
+---
+
 # zkFedMoE
 
 **Zero-Knowledge Federated Mixture-of-Experts for Privacy-Preserving Adaptive LLM Customization at the Intelligent Edge**
