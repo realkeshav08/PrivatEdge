@@ -171,6 +171,9 @@ Report/*
 # Personal / viva-prep Hinglish material (not for public repo)
 hinglish/
 
+# Personal beginner-friendly explainer / study notes
+explainer/
+
 # Internal verification + audit trail (supervisor-facing, not for public repo)
 verify/
 
