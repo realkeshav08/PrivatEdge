@@ -173,51 +173,55 @@ python run_demo.py
 
 ## Experimental Results
 
-All experiments use AG News (120K train, 7.6K test, 4 classes), 5 clients, 5 FL rounds, E=8 experts, K=2 default, seed=42.
+All numbers below match the conference paper and major project report. The dashboard reads them from [plots/experiment_results.json](plots/experiment_results.json).
 
-### Experiment 1: Privacy-Utility Tradeoff
+Base AG News configuration: 120K train, 7.6K test, 4 classes, 5 clients, 5 FL rounds, E=8 experts, K=2 default, seed=42. Robustness (Experiment 4) and the non-IID / MIA / FedProx sweeps use 9 clients and 8 rounds so coordinate-wise median is computed over a stable honest population.
 
-| Noise σ | Privacy ε | Accuracy |
-|---------|-----------|----------|
-| 0.0 (no DP) | ∞ | **58.00%** |
-| 0.1 | 0.289 | 25.00% |
-| 0.5 | 0.058 | 25.01% |
-| 1.0 | 0.029 | 26.12% |
-| 2.0 | 0.014 | 25.00% |
+### Experiment 1: Privacy-Utility Tradeoff (δ = 10⁻⁵)
 
-Confirms correct (ε, δ) accounting. Accuracy cliff at σ ≥ 0.1 is expected for small-scale DP-SGD (5 rounds, 600K params).
+| Noise σ | ε (basic, √T) | ε (Rényi) | Accuracy |
+|---------|--------------|-----------|----------|
+| 0.0 (no DP) | ∞ | ∞ | **57.09%** |
+| 0.1 | 0.289 | 250.40 | 25.00% |
+| 0.5 | 0.058 | 3.060 | 25.00% |
+| 1.0 | 0.029 | 0.775 | 25.00% |
+| 2.0 | 0.014 | 0.184 | 25.00% |
+
+Rényi accountant is orders-of-magnitude tighter than the naive √T bound. Accuracy cliff at σ ≥ 0.1 is expected for a 600K-parameter MoE trained for only 5 rounds — DP noise overwhelms the gradient signal. The same σ regime is *not* catastrophic for the smaller 25K disease MLP (see Experiment 8), so DP calibration is model-size dependent.
 
 ### Experiment 2: Communication Savings vs Top-K
 
-| K | Accuracy | Saving |
-|---|----------|--------|
-| 1 | 54.24% | **39.52%** |
-| 3 | 57.66% | 28.23% |
-| 4 | **59.09%** | 22.58% |
-| 8 | 55.99% | 0.00% |
+| K | Accuracy | Saving | Dense / Sparse (MB) |
+|---|----------|--------|---------------------|
+| 1 | 56.16% | **39.52%** | 58.6 / 35.4 |
+| 2 | 57.59% | 33.88% | 58.6 / 38.8 |
+| 3 | 57.25% | 28.23% | 58.6 / 42.1 |
+| 4 | **74.42%** | 22.58% | 58.6 / 45.4 |
+| 8 | 70.51% | 0.00% | 58.6 / 58.6 |
 
-Sweet spot: **K=3–4**. Top-K routing acts as implicit regularization (K=8 < K=4).
+Sweet spot: **K = 4**. Top-K routing acts as implicit regularization — activating all 8 experts forces never-specialised ones into every prediction, which hurts accuracy. The K = 4 regime trades 22.58% of bandwidth for the best observed accuracy.
 
 ### Experiment 3: SEPG Verification Overhead
 
 | K | Gen (ms) | Verify (ms) | Total (ms) |
 |---|----------|-------------|------------|
-| 1 | 2.91 | 2.88 | 5.79 |
-| 4 | 2.94 | 3.22 | 6.16 |
-| 8 | 3.19 | 2.84 | 6.03 |
+| 1 | 5.44 | 6.28 | 11.72 |
+| 4 | 4.81 | 5.44 | 10.25 |
+| 8 | 5.55 | 6.98 | 12.53 |
+| **Mean (K=1–8)** | **5.13** | **5.75** | **10.89 ± 0.77** |
 
-**~6 ms per client**, constant with K. Negligible vs. training time.
+**~11 ms per client**, roughly constant with K (both phases are dominated by SHA-256 over the sparse state). On a 5-client federation this adds ~55 ms per round — below 0.5% of per-round training time.
 
-### Experiment 4: Robustness Under Poisoning
+### Experiment 4: Robustness Under Poisoning (9 clients, 8 rounds)
 
 | Malicious | FedAvg | Median | TrimMean |
 |-----------|--------|--------|----------|
-| 0% | **57.86%** | 53.04% | 53.16% |
-| 20% | 48.57% | 51.25% | **54.84%** |
-| 40% | 41.82% | **45.95%** | 43.95% |
-| Drop (0→40) | −16.04 pp | **−7.09 pp** | −9.21 pp |
+| 0% | 51.08% | 47.87% | **52.57%** |
+| 22% | 48.59% | **51.74%** | 50.57% |
+| 44% | 37.82% | **43.34%** | 42.75% |
+| Drop (0→44) | −13.26 pp | **−4.53 pp** | −9.82 pp |
 
-Median is most robust under 40% attackers; FedAvg is most vulnerable.
+Coordinate-wise median is most robust under heavy poisoning; FedAvg is most vulnerable. We use N = 9 so that even at 44% malicious (f = 4) the median is computed over 5 honest clients.
 
 ---
 

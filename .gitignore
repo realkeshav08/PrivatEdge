@@ -163,3 +163,16 @@ results.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Report folder — only the presentation slide deck is public
+Report/*
+!Report/Zkfedmoepdf.pdf
+
+# Personal / viva-prep Hinglish material (not for public repo)
+hinglish/
+
+# Internal verification + audit trail (supervisor-facing, not for public repo)
+verify/
+
+# Claude Code local settings
+.claude/

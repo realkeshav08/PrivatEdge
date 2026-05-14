@@ -395,7 +395,7 @@ if page == "🏠 Home":
     k2.metric("Vocabulary",     "5 000", "most frequent tokens")
     k3.metric("Experts",        "8",     "per MoE layer")
     k4.metric("Comm Saving",    "~40%",  "at Top-K = 1")
-    k5.metric("Proof Overhead", "~6 ms", "per client")
+    k5.metric("Proof Overhead", "~11 ms", "per client")
     k6.metric("Classes",        "4",     "World/Sports/Biz/Tech")
 
     st.divider()
@@ -411,7 +411,7 @@ if page == "🏠 Home":
     | 4 | **Compare** | Drag the K slider to show real-time communication saving calculation |
     | 5 | **Privacy & DP** | Run DP training, show SEPG proofs with PASS badges |
     | 6 | **Robustness** | Run Poisoning at 30% — show FedAvg drops, Median holds |
-    | 7 | **Experiments** | Open all 4 interactive charts, point to sweet-spot K=3–4 |
+    | 7 | **Experiments** | Open all 4 interactive charts, point to sweet-spot K=4 |
     | 8 | **Custom CSV** | Upload your own CSV and train a new model live |
     """)
 
@@ -1869,9 +1869,9 @@ elif page == "Experiments":
             st.warning("Run the experiment suite to generate this plot.")
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("No DP Accuracy",    "58.0%", "σ=0")
-    c2.metric("With DP (σ=0.1)",   "25.0%", "ε=0.29")
-    c3.metric("Privacy cost",      "~33% accuracy", "at tight ε")
+    c1.metric("No DP Accuracy",    "57.1%", "σ=0")
+    c2.metric("With DP (σ=0.1)",   "25.0%", "ε=0.29 (basic), 250.4 (Rényi)")
+    c3.metric("Privacy cost",      "~32 pp", "drop at tight ε")
 
     # ---- Exp 2: Communication vs K ----
     st.divider()
@@ -1925,15 +1925,15 @@ elif page == "Experiments":
             st.warning("Run the experiment suite to generate this plot.")
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Best Accuracy", "59.1%", "at K=4")
+    c1.metric("Best Accuracy", "74.4%", "at K=4")
     c2.metric("Best Saving",   "39.5%", "at K=1")
-    c3.metric("Sweet Spot",    "K=3–4", "28% saving, ~57% accuracy")
+    c3.metric("Sweet Spot",    "K=4",   "22.6% saving, 74.4% accuracy")
 
     # ---- Exp 3: Verification Overhead ----
     st.divider()
     st.subheader("Experiment 3: SEPG Verification Overhead")
     st.markdown(
-        "Proof generation + verification time is constant ~6 ms across all K values."
+        "Proof generation + verification time is roughly constant at ~10.9 ms across all K values."
     )
 
     if "verification_overhead" in exp_results:
@@ -1975,15 +1975,15 @@ elif page == "Experiments":
             st.warning("Run the experiment suite to generate this plot.")
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Avg Gen Time",    "~3.1 ms")
-    c2.metric("Avg Verify Time", "~3.0 ms")
-    c3.metric("Total Overhead",  "~6.1 ms", "Constant K=1..8")
+    c1.metric("Avg Gen Time",    "~5.1 ms")
+    c2.metric("Avg Verify Time", "~5.8 ms")
+    c3.metric("Total Overhead",  "~10.9 ms", "± 0.77 ms across K=1..8")
 
     # ---- Exp 4: Robustness ----
     st.divider()
     st.subheader("Experiment 4: Robustness Under Poisoning Attacks")
     st.markdown(
-        "Accuracy of FedAvg, Median, and Trimmed Mean as malicious fraction grows 0→40%."
+        "Accuracy of FedAvg, Median, and Trimmed Mean as malicious fraction grows 0→44% (9 clients, 8 rounds)."
     )
 
     if "robustness" in exp_results:
@@ -2033,9 +2033,9 @@ elif page == "Experiments":
             st.warning("Run the experiment suite to generate this plot.")
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("FedAvg @ 40% mal",      "41.8%", "-16% from clean")
-    c2.metric("Median @ 40% mal",      "46.0%", "-7% from clean")
-    c3.metric("Trimmed Mean @ 40%",    "44.0%", "-9% from clean")
+    c1.metric("FedAvg @ 44% mal",      "37.8%", "-13.3 pp from clean")
+    c2.metric("Median @ 44% mal",      "43.3%", "-4.5 pp from clean")
+    c3.metric("Trimmed Mean @ 44%",    "42.8%", "-9.8 pp from clean")
 
     st.info(
         "Median is the most robust — coordinate-wise aggregation limits "
