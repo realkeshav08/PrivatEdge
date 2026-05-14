@@ -10,6 +10,9 @@ pinned: false
 
 # zkFedMoE
 
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/keshavkashyap/PrivatEdge)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pvtedge.streamlit.app)
+
 **Zero-Knowledge Federated Mixture-of-Experts for Privacy-Preserving Adaptive LLM Customization at the Intelligent Edge**
 
 Major Project | Group #34 | IIIT Kota | April 2026
